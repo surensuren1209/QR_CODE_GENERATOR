@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HACKER QR CODE GENERATOR</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <style>
+    body {
+      background-color: #000;
+      color: #00ff00;
+      font-family: 'Courier New', monospace;
+      padding: 20px;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 28px;
+      border-right: .15em solid #00ff00;
+      white-space: nowrap;
+      overflow: hidden;
+      width: 0;
+      animation: typing 3s steps(40, end) forwards, blink .75s step-end infinite;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+
+    @keyframes blink {
+      from, to { border-color: transparent }
+      50% { border-color: #00ff00 }
+    }
+
+    input, select, textarea, button {
+      background-color: #001a00;
+      color: #00ff00;
+      border: 1px solid #00ff00;
+      padding: 10px;
+      margin: 8px auto;
+      width: 80%;
+      display: block;
+      font-family: 'Courier New', monospace;
+    }
+
+    button {
+      background-color: #003300;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #005500;
+    }
+
+    #formArea {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    #qrcode {
+      display: block;
+      margin: 40px auto 20px auto;
+      width: 200px !important;
+      height: 200px !important;
+    }
+
+    .glow {
+      text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00;
+    }
+
+    .flicker {
+      animation: flicker 1.5s infinite alternate;
+    }
+
+    @keyframes flicker {
+      0%   { opacity: 1; }
+      50%  { opacity: 0.4; }
+      100% { opacity: 1; }
+    }
+
+    footer {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      font-size: 14px;
+      color: #00ff00;
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body>
+
+  <h1 class="glow">>_ QR CODE GENERATOR</h1>
+
+  <div style="text-align: center">
+    <label for="type" class="glow flicker">Choose QR Type:</label><br>
+    <select id="type" onchange="updateForm()">
+      <option value="url">URL</option>
+      <option value="phone">Phone</option>
+      <option value="sms">SMS</option>
+      <option value="email">Email</option>
+      <option value="contact">Contact</option>
+      <option value="text">Plain Text</option>
+      <option value="pdf">PDF</option>
+    </select>
+  </div>
+
+  <div id="formArea"></div>
+
+  <button onclick="generateQR()">[ GENERATE QR ]</button>
+
+  <canvas id="qrcode" width="200" height="200"></canvas>
+
+  <footer>@Created by Suren © 2025</footer>
+
+  <script>
+    function updateForm() {
+      const type = document.getElementById('type').value;
+      const form = document.getElementById('formArea');
+      let html = '';
+
+      switch (type) {
+        case 'url':
+        case 'pdf':
+          html = `<input type="text" id="inputData" placeholder="Enter URL or PDF link">`;
+          break;
+        case 'phone':
+          html = `<input type="text" id="inputData" placeholder="+919876543210">`;
+          break;
+        case 'sms':
+          html = `
+            <input type="text" id="phone" placeholder="Phone Number"><br>
+            <textarea id="message" placeholder="Enter message"></textarea>
+          `;
+          break;
+        case 'email':
+          html = `
+            <input type="text" id="email" placeholder="Email address"><br>
+            <input type="text" id="subject" placeholder="Subject"><br>
+            <textarea id="body" placeholder="Body message"></textarea>
+          `;
+          break;
+        case 'contact':
+          html = `
+            <input type="text" id="name" placeholder="Full Name"><br>
+            <input type="text" id="phone" placeholder="Phone"><br>
+            <input type="text" id="email" placeholder="Email"><br>
+            <input type="text" id="org" placeholder="Organization">
+          `;
+          break;
+        case 'text':
+          html = `<textarea id="inputData" placeholder="Enter plain text"></textarea>`;
+          break;
+      }
+
+      form.innerHTML = html;
+    }
+
+    function generateQR() {
+      const type = document.getElementById('type').value;
+      let data = '';
+
+      switch (type) {
+        case 'url':
+        case 'pdf':
+        case 'text':
+        case 'phone':
+          data = document.getElementById('inputData').value.trim();
+          if (type === 'phone') data = `tel:${data}`;
+          break;
+        case 'sms':
+          const smsPhone = document.getElementById('phone').value.trim();
+          const smsMsg = encodeURIComponent(document.getElementById('message').value.trim());
+          data = `sms:${smsPhone}?body=${smsMsg}`;
+          break;
+        case 'email':
+          const email = document.getElementById('email').value.trim();
+          const subject = encodeURIComponent(document.getElementById('subject').value.trim());
+          const body = encodeURIComponent(document.getElementById('body').value.trim());
+          data = `mailto:${email}?subject=${subject}&body=${body}`;
+          break;
+        case 'contact':
+          const name = document.getElementById('name').value.trim();
+          const phone = document.getElementById('phone').value.trim();
+          const mail = document.getElementById('email').value.trim();
+          const org = document.getElementById('org').value.trim();
+          data = `BEGIN:VCARD\nVERSION:3.0\nFN:${name}\nTEL:${phone}\nEMAIL:${mail}\nORG:${org}\nEND:VCARD`;
+          break;
+      }
+
+      QRCode.toCanvas(document.getElementById('qrcode'), data, function (error) {
+        if (error) console.error(error);
+        else console.log('QR Code Generated!');
+      });
+    }
+
+    updateForm(); // Initial load
+  </script>
+
+</body>
+</html>
