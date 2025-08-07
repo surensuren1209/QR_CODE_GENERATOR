@@ -27,7 +27,7 @@ Perfect for students, developers, businesses, and offline usage 🔒.
 
 > 💡 _If hosted on GitHub Pages, add the link below:_
 
-🔗 **Live Preview**: [Click here to try it!](https://your-username.github.io/qr-code-generator)
+🔗 **Live Preview**: [Click here to try it!](https://suren-qrgen.netlify.app/)
 
 ---
 
